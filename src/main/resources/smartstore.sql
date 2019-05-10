@@ -49,6 +49,16 @@ CREATE TABLE store_capacity(
 );
 
 
+CREATE VIEW sku_sale_view AS
+SELECT s.store_id AS store_id, li.sku_id AS sku_id, s.sale_date AS date, sum(quantity)::integer AS quantity
+FROM sale s INNER JOIN line_item li  ON s.store_id = li.store_id AND  s.cart_id = li.cart_id
+GROUP BY li.sku_id, s.store_id, s.sale_date;
+
+CREATE VIEW user_sku_view AS
+SELECT s.user_id AS user_id, s.sale_date AS date, s.store_id AS store_id, li.sku_id AS sku_id, sum(quantity) AS quantity
+FROM sale s INNER JOIN line_item li  ON s.store_id = li.store_id AND  s.cart_id = li.cart_id
+GROUP BY s.user_id, s.store_id, s.sale_date, li.sku_id;
+
 INSERT INTO product(store_id, sku_id, name, category, sub_category, price, weight ) VALUES ('STORE00001', 'SKU0000001', 'Steam Rice - Kolam', 'Food Grains', 'Rice Products', 60.00, 1000);
 INSERT INTO product(store_id, sku_id, name, category, sub_category, price, weight ) VALUES ('STORE00001', 'SKU0000002', 'Poha', 'Food Grains', 'Rice Products', 49.00, 1000);
 INSERT INTO product(store_id, sku_id, name, category, sub_category, price, weight ) VALUES ('STORE00001', 'SKU0000003', 'Basmati Rice - Dubar', 'Food Grains', 'Rice Products', 156.50, 1000);

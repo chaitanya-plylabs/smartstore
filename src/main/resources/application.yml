@@ -22,5 +22,8 @@ spring:
     hibernate:
       ddl-auto: validate
 
+solver:
+  url: http://172.17.0.4:7000/replenish
+
 server:
   port: 9456

@@ -52,4 +52,9 @@ public class AppConfig {
                 .serializer(serializer)
                 .build();
     }
+
+    @Bean("solverUrl")
+    String solverUrl() {
+        return this.environment.getProperty("solver.url");
+    }
 }
