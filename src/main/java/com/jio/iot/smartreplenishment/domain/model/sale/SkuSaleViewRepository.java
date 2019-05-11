@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface SkuSaleViewRepository extends CrudRepository<SkuSaleView, SkuSaleView> {
+public interface SkuSaleViewRepository extends CrudRepository<SkuSaleView, Long> {
     @Query("SELECT sv from SkuSaleView sv WHERE sv.id.storeId = :storeId")
-    List<SkuSaleView> fingByStoreId(@Param("storeId") String storeId);
+    List<SkuSaleView> findByStoreId(@Param("storeId") String storeId);
 }

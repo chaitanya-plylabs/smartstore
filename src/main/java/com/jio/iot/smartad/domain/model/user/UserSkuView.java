@@ -1,13 +1,13 @@
-package com.jio.iot.smartreplenishment.domain.model.sale;
-
+package com.jio.iot.smartad.domain.model.user;
 
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "sku_sale_view")
+@Table(name = "user_sku_view")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,10 +15,13 @@ import java.util.Date;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class SkuSaleView {
+public class UserSkuView {
     @Id
     @Column(name = "row_num")
     private Long id;
+
+    @Column(name = "user_id")
+    private String userId;
 
     @Column(name = "store_id")
     private String storeId;
@@ -32,4 +35,7 @@ public class SkuSaleView {
 
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Column(name = "amount")
+    private BigDecimal amount;
 }
