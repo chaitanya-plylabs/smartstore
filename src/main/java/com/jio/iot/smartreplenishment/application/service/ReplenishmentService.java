@@ -1,7 +1,6 @@
 package com.jio.iot.smartreplenishment.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.jio.iot.smartreplenishment.application.representation.ConstraintRepresentation;
 import com.jio.iot.smartreplenishment.application.representation.ReplenishRepresentation;
 import com.jio.iot.smartreplenishment.domain.model.Forecasting;

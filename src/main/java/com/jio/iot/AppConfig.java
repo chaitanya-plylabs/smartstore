@@ -16,9 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 public class AppConfig {
@@ -57,13 +54,8 @@ public class AppConfig {
     }
 
     @Bean("solverUrl")
-    String solverUrl() {
+    public String solverUrl() {
         return this.environment.getProperty("solver.url");
     }
 
-//    @SuppressWarnings("ConstantConditions")
-//    @Bean("adRules")
-//    List<String> adRules() {
-//        return Arrays.stream(this.environment.getProperty("ad.rules", String[].class)).collect(Collectors.toList());
-//    }
 }

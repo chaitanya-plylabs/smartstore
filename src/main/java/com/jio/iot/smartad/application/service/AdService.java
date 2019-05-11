@@ -1,7 +1,7 @@
 package com.jio.iot.smartad.application.service;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.jio.iot.smartad.application.AdRulesConfig;
 import com.jio.iot.smartad.domain.model.Offer;
 import com.jio.iot.smartad.domain.model.ProximityConfiguration;
 import com.jio.iot.smartad.domain.model.ProximityConfigurationRepository;
@@ -28,6 +28,9 @@ public class AdService {
     @Autowired
     private UserSkuViewRepository userSkuViewRepository;
 
+    @Autowired
+    private AdRulesConfig adRulesConfig;
+
     public List<Offer> getOffers(final UserEnteredBeaconProximityEvent event) {
         final var skusAtProximity = this.proximityConfigurationRepository
                 .findByBeaconId(event.getStoreId(), event.getBeaconId())
@@ -36,49 +39,54 @@ public class AdService {
                 .collect(Collectors.toSet());
         final var offers = new ArrayList<Offer>();
         skusAtProximity
-                .forEach(skuId -> offers.addAll(this.getOffers(event.getUserId(), skuId, event.getStoreId())));
+                .forEach(skuId -> {
+                    final var ruleContext = new HashMap<>(this.getBaseRuleContext(event.getUserId(), event.getStoreId(), skuId));
+                    ruleContext.put("event", "UserEnteredBeaconProximityEvent");
+                    Optional.ofNullable(this.executeOfferRule(ruleContext)).ifPresent(offers::add);
+                });
+
         return offers;
     }
 
     public List<Offer> getOffers(final UserHomeSkuQuantityEvent event) {
-        return this.getOffers(event.getUserId(), event.getSkuId(), null);
+        final var offers = new ArrayList<Offer>();
+        final var userStores = this.userSkuViewRepository.findByUserId(event.getUserId())
+                .stream()
+                .map(UserSkuView::getStoreId)
+                .collect(Collectors.toList());
+        userStores
+                .forEach(storeId -> {
+                    final var ruleContext = new HashMap<>(this.getBaseRuleContext(event.getUserId(), storeId, event.getSkuId()));
+                    ruleContext.put("deviceId", event.getDeviceId());
+                    ruleContext.put("homeSkuQuantity", event.getQuantity());
+                    ruleContext.put("event", "UserHomeSkuQuantityEvent");
+                    Optional.ofNullable(this.executeOfferRule(ruleContext)).ifPresent(offers::add);
+                });
+        return offers;
     }
 
-    private List<Offer> getOffers(final String userId, final String skuId, final String storeId) {
-        return Optional.ofNullable(storeId)
-                .map(x -> Optional.ofNullable(this.executeOfferRule(this.getRuleContext(userId, x, skuId)))
-                    .map(ImmutableList::of)
-                    .orElse(ImmutableList.of()))
-                .orElseGet(() -> {
-                    final var userStores = this.userSkuViewRepository.findByUserId(userId)
-                            .stream()
-                            .map(UserSkuView::getStoreId)
-                            .collect(Collectors.toList());
-                    return ImmutableList.copyOf(userStores.stream()
-                            .map(x -> this.executeOfferRule(this.getRuleContext(userId, x, skuId)))
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toList()));
-                });
-    }
 
     private Offer executeOfferRule(final Map<String, Object> ruleContext) {
-        final var expression = "#storeId matches 'STORE00001' && #skuId matches 'SKU0000001' && #amountSpent > 500 ? 10 : null ";
-        final var evaluationContext = new StandardEvaluationContext();
-        evaluationContext.setVariables(ruleContext);
-        final var parser = new SpelExpressionParser();
-        final var percentage = parser.parseExpression(expression).getValue(evaluationContext, Double.class);
-        return Optional.ofNullable(percentage)
-                .map(x -> Offer.builder()
+        for(int i = 0; i < adRulesConfig.getRules().size(); i++) {
+            final var expression = adRulesConfig.getRules().get(i);
+            final var evaluationContext = new StandardEvaluationContext();
+            evaluationContext.setVariables(ruleContext);
+            final var parser = new SpelExpressionParser();
+            final var percentage = parser.parseExpression(expression).getValue(evaluationContext, Double.class);
+            if(percentage != null) {
+                return Offer.builder()
                         .storeId((String) ruleContext.get("storeId"))
                         .userId((String) ruleContext.get("userId"))
                         .skuId((String) ruleContext.get("skuId"))
                         .percentOffer(percentage)
-                        .build())
-                .orElse(null);
+                        .build();
+            }
+        }
+        return null;
     }
 
 
-    private Map<String, Object> getRuleContext(final String userId, final String storeId, final String skuId) {
+    private Map<String, Object> getBaseRuleContext(final String userId, final String storeId, final String skuId) {
         final var userSkuSales =  this.userSkuViewRepository.findByUserId(userId);
         final var userStoreSkuSales = userSkuSales.stream()
                 .filter(x -> x.getStoreId().equals(storeId))

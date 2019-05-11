@@ -2,7 +2,6 @@ package com.jio.iot.smartcheckout.application.resources;
 
 import com.jio.iot.smartcheckout.domain.model.PaymentInformation;
 import com.jio.iot.smartcheckout.domain.model.cart.commands.*;
-import io.grpc.BinaryLog;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

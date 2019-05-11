@@ -14,7 +14,7 @@ datasource:
 
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
@@ -30,7 +30,8 @@ solver:
 
 ad:
   rules:
-    - #money_spent_on_product >  1200 ? true : false
+    - "#event matches 'UserEnteredBeaconProximityEvent' && #storeId matches 'STORE00001' && #skuId matches 'SKU0000001' && #amountSpent > 500 ? 10 : null"
+    - "#event matches 'UserHomeSkuQuantityEvent' && #deviceId matches 'COOLER0001' && #skuId matches 'SKU0000001' && #homeSkuQuantity < 200 && #amountSpent > 1000 ? 15 : null"
 
 server:
   port: 9456
