@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Service
+@Service("SMAForecasting")
 public class SMAForecasting implements Forecasting {
     @Autowired
     private SkuSaleViewRepository skuSaleViewRepository;

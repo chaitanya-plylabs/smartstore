@@ -25,6 +25,7 @@ public class ReplenishmentService {
     private SkuSaleViewRepository skuSaleViewRepository;
 
     @Autowired
+    @Qualifier("RandomForecastingForPrototype")
     private Forecasting forecasting;
 
     @Autowired
@@ -39,7 +40,7 @@ public class ReplenishmentService {
         final var httpClient = HttpClient.newHttpClient();
         final var httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(this.solverUrl))
-                .timeout(Duration.ofMinutes(5))
+                .timeout(Duration.ofMinutes(15))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(mapper.writer().writeValueAsString(buildRequest(representation, forecast))))
                 .build();
@@ -51,7 +52,7 @@ public class ReplenishmentService {
                     var skus = forecast.keySet().toArray(new String[0]);
                     IntStream.iterate(0, i -> i + 1)
                             .limit(skus.length)
-                            .forEach(i -> result.put(skus[0], x.get(0)));
+                            .forEach(i -> result.put(skus[i], x.get(i)));
                     return result;
                     })
                 .get();

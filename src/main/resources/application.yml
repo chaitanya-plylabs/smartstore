@@ -26,7 +26,7 @@ spring:
 
 
 solver:
-  url: http://172.17.0.4:7000/replenish
+  url: http://localhost:7000/replenish
 
 ad:
   rules:

@@ -16,8 +16,8 @@ CREATE TABLE product(
     name text NOT NULL,
     category text NOT NULL,
     sub_category text NOT NULL,
-    price numeric NOT NULL,
-    weight numeric NOT NULL,
+    price numeric(10,2) NOT NULL,
+    weight numeric(10,2) NOT NULL,
     PRIMARY KEY (store_id, sku_id)
 );
 
@@ -26,7 +26,7 @@ CREATE TABLE sale(
     cart_id text NOT NULL,
     user_id text NOT NULL,
     created_epoch bigint NOT NULL,
-    amount numeric NOT NULL,
+    amount numeric(10,2) NOT NULL,
     sale_date date NOT NULL,
     PRIMARY KEY(store_id, cart_id)
 );
@@ -36,8 +36,8 @@ CREATE TABLE line_item(
     cart_id text NOT NULL,
     sku_id text NOT NULL,
     quantity integer NOT NULL,
-    weight numeric NOT NULL,
-    price numeric NOT NULL,
+    weight numeric(10,2) NOT NULL,
+    price numeric(10,2) NOT NULL,
     PRIMARY KEY(store_id, cart_id, sku_id)
 );
 
