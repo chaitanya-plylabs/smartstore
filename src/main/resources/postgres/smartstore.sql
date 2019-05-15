@@ -5,7 +5,7 @@ CREATE TABLE token_entry(
     token oid,
     token_type text,
     owner text,
-    'timestamp' text NOT NULL,
+    timestamp text NOT NULL,
     PRIMARY KEY (processor_name, segment)
 );
 ---------------------------------
