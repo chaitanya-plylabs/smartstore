@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Service
+@Service("SMAForecasting")
 public class SMAForecasting implements Forecasting {
     @Autowired
     private SkuSaleViewRepository skuSaleViewRepository;
@@ -18,13 +18,13 @@ public class SMAForecasting implements Forecasting {
 
     @Override
     public Map<String, List<Integer>> forecast(final String storeId, final Integer noOfDays) {
-        final var skuSales = this.skuSaleViewRepository.fingByStoreId(storeId);
+        final var skuSales = this.skuSaleViewRepository.findByStoreId(storeId);
         skuSales.sort(Comparator.comparing(SkuSaleView::getDate));
-        final var skuIds = skuSales.stream().map(x -> x.getId().getSkuId()).collect(Collectors.toSet());
+        final var skuIds = skuSales.stream().map(SkuSaleView::getSkuId).collect(Collectors.toSet());
         final var result = new HashMap<String, List<Integer>>();
         skuIds.forEach(skuId -> {
             final var dataset = skuSales.stream()
-                    .filter(x -> x.getId().getSkuId().equals(skuId))
+                    .filter(x -> x.getSkuId().equals(skuId))
                     .map(SkuSaleView::getQuantity)
                     .collect(Collectors.toList());
             final var predicted = this.sma(dataset, noOfDays);

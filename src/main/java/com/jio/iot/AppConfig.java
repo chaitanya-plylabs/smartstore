@@ -54,7 +54,8 @@ public class AppConfig {
     }
 
     @Bean("solverUrl")
-    String solverUrl() {
+    public String solverUrl() {
         return this.environment.getProperty("solver.url");
     }
+
 }
